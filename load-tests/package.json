@@ -1,0 +1,13 @@
+{
+  "name": "devprep-load-tests",
+  "version": "1.0.0",
+  "description": "Baseline performance and load testing suite for DevPrep AI backend",
+  "main": "baseline-test.js",
+  "scripts": {
+    "test:baseline": "node baseline-test.js"
+  },
+  "dependencies": {
+    "autocannon": "^7.15.0",
+    "exceljs": "^4.4.0"
+  }
+}

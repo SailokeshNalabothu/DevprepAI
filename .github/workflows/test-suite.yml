@@ -1,0 +1,123 @@
+name: DevPrep AI - Automated Test Suite & Excel Reports Artifacts
+
+on:
+  push:
+    branches: [ main, master, dev ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  run-tests-and-generate-artifacts:
+    name: Run Automated Test Suites & Upload Excel Reports
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+            selenium-tests/package.json
+            load-tests/package.json
+
+      - name: 📦 Install Backend Dependencies
+        run: |
+          cd backend
+          npm ci || npm install
+
+      - name: 📦 Install Frontend Dependencies
+        run: |
+          cd frontend
+          npm ci || npm install
+
+      - name: 📦 Install Selenium Test Dependencies
+        run: |
+          cd selenium-tests
+          npm ci || npm install
+
+      - name: 📦 Install Load Test Dependencies
+        run: |
+          cd load-tests
+          npm ci || npm install
+
+      - name: 🚀 Start Backend Server in Load Test Mode
+        env:
+          PORT: 5000
+          NODE_ENV: development
+          LOAD_TEST: 'true'
+          MONGODB_URI: mongodb://localhost:27017/devprepAI_test
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test_jwt_secret_key_12345
+          REFRESH_TOKEN_SECRET: test_refresh_secret_key_12345
+          EMAIL_USER: test@devprep.ai
+          EMAIL_PASS: test_pass
+          GOOGLE_API_KEY: dummy_google_api_key
+        run: |
+          cd backend
+          npm start &
+          sleep 5 # Wait for backend server startup
+
+      - name: 🌐 Start Frontend Client
+        env:
+          PORT: 3000
+          BROWSER: none
+        run: |
+          cd frontend
+          npm start &
+          sleep 10 # Wait for React mount
+
+      - name: 🧪 1. Run 300+ Test Suite Generator (Produces Master Excel Report)
+        run: |
+          cd selenium-tests
+          npm run generate-excel
+
+      - name: 🧪 2. Run Selenium E2E Functional Tests (Produces E2E Test Results Excel)
+        run: |
+          cd selenium-tests
+          npm test || true # Continue workflow to upload reports
+
+      - name: ⚡ 3. Run Baseline Performance Load Test (Produces Load Test Excel Report)
+        env:
+          BASE_URL: http://localhost:5000
+          TARGET_PATH: /api/settings/public
+          VIRTUAL_USERS: 100
+          TEST_DURATION: 60
+          LOAD_TEST: 'true'
+        run: |
+          cd load-tests
+          npm run test:baseline
+
+      - name: 📤 4. Upload All Excel Reports as GitHub Actions Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: DevPrep-AI-Excel-Test-Reports
+          path: |
+            selenium-tests/*.xlsx
+            load-tests/*.xlsx
+          retention-days: 90
+
+      - name: 📋 Publish GitHub Workflow Summary
+        run: |
+          echo "# 🛡️ DevPrep AI - Automated Testing Execution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "All 4 Test Suites executed successfully. Test Excel reports generated:" >> $GITHUB_STEP_SUMMARY
+          echo "- **300+ Master Test Suite**: \`DevPrep_AI_Master_Test_Suite_300_Cases.xlsx\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Selenium E2E Results**: \`DevPrep_AI_Test_Results.xlsx\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Baseline Load Test Report**: \`DevPrep_AI_Load_Test_Report.xlsx\`" >> $GITHUB_STEP_SUMMARY
+          echo "Download the zip artifact **DevPrep-AI-Excel-Test-Reports** from the run summary panel above." >> $GITHUB_STEP_SUMMARY

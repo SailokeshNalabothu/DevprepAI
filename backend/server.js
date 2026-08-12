@@ -104,9 +104,11 @@ app.use((req, res, next) => {
 
 // Global Rate Limiting
 const isDev = process.env.NODE_ENV === "development" || !process.env.NODE_ENV;
+const isLoadTest = process.env.LOAD_TEST === "true" || process.env.NODE_ENV === "loadtest";
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: isDev ? 10000 : 100,
+  max: isLoadTest ? 1000000 : (isDev ? 10000 : 100),
   message: "Too many requests from this IP, please try again later.",
   standardHeaders: true,
   legacyHeaders: false,
@@ -126,7 +128,7 @@ app.use("/api/settings", settingsRoutes);
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error("\x1b[31m%s\x1b[0m", `[ERROR] ${err.stack || err.message}`);
-  
+
   const statusCode = err.status || 500;
   res.status(statusCode).json({
     message: statusCode === 500 ? "Internal Server Error" : err.message,

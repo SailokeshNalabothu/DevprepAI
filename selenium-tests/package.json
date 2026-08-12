@@ -1,0 +1,14 @@
+{
+  "name": "devprep-selenium-tests",
+  "version": "1.0.0",
+  "description": "Selenium E2E Automated Test Suite & Excel Report Generator for DevPrep AI",
+  "main": "tests/login-tests.js",
+  "scripts": {
+    "test": "node tests/login-tests.js",
+    "generate-excel": "node generate-report.js"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "selenium-webdriver": "^4.28.0"
+  }
+}
