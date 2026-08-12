@@ -71,8 +71,8 @@ exports.syncToGithub = async (user, submission, question) => {
  * Get GitHub Authorization URL
  */
 exports.getAuthUrl = () => {
-  const clientId = process.env.GITHUB_CLIENT_ID;
-  const redirectUri = process.env.GITHUB_REDIRECT_URI || "http://localhost:5000/api/users/github/callback";
+  const clientId = (process.env.GITHUB_CLIENT_ID || "").trim();
+  const redirectUri = (process.env.GITHUB_REDIRECT_URI || "http://localhost:5000/api/users/github/callback").trim();
   const scope = "public_repo";
   return `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
 };
@@ -82,8 +82,8 @@ exports.getAuthUrl = () => {
  */
 exports.exchangeCodeForToken = async (code) => {
   const { data } = await axios.post("https://github.com/login/oauth/access_token", {
-    client_id: process.env.GITHUB_CLIENT_ID,
-    client_secret: process.env.GITHUB_CLIENT_SECRET,
+    client_id: (process.env.GITHUB_CLIENT_ID || "").trim(),
+    client_secret: (process.env.GITHUB_CLIENT_SECRET || "").trim(),
     code
   }, {
     headers: { Accept: "application/json" }
