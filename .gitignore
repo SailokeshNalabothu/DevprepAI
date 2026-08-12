@@ -41,3 +41,8 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+brain/
+
+# Test Suite Dependencies
+load-tests/node_modules/
+selenium-tests/node_modules/
