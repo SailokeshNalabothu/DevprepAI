@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "DevPrep AI",
+    "slug": "devprep-ai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "devprep",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#090d16"
+    },
+    "ios": {
+      "supportsTabletMode": true
+    },
+    "android": {
+      "package": "com.devprep.ai"
+    },
+    "plugins": [
+      "expo-asset"
+    ]
+  }
+}

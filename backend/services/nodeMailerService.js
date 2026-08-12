@@ -63,7 +63,8 @@ exports.sendWelcomeEmail = async (email, name) => {
 };
 
 exports.sendResetEmail = async (email, token) => {
-  const resetUrl = `http://localhost:3000/reset-password?token=${token}`;
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+  const resetUrl = `${frontendUrl}/reset-password?token=${token}`;
   const mailOptions = {
     from: `"DevPrep AI" <${process.env.EMAIL_USER}>`,
     to: email,

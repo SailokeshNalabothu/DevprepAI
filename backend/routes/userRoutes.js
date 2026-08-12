@@ -131,10 +131,12 @@ router.get("/github/callback", async (req, res) => {
   res.clearCookie("github_state");
   res.clearCookie("github_user_id");
 
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+
   // Validate state to prevent CSRF / session hijacking
   if (!state || state !== savedState || !savedUserId) {
     console.warn("[OAuth Alert] CSRF check failed or session expired during GitHub callback");
-    return res.redirect("http://localhost:3000/profile?github=error");
+    return res.send(`<script>window.location.href="devprep://profile?github=error"; setTimeout(()=>{ window.location.href="${frontendUrl}/profile?github=error"; }, 500);</script>`);
   }
 
   try {
@@ -149,10 +151,10 @@ router.get("/github/callback", async (req, res) => {
       githubUsername: username 
     });
     
-    res.redirect("http://localhost:3000/profile?github=success");
+    res.send(`<script>window.location.href="devprep://profile?github=success"; setTimeout(()=>{ window.location.href="${frontendUrl}/profile?github=success"; }, 500);</script>`);
   } catch (error) {
     console.error("GitHub Callback Error:", error.message);
-    res.redirect("http://localhost:3000/profile?github=error");
+    res.send(`<script>window.location.href="devprep://profile?github=error"; setTimeout(()=>{ window.location.href="${frontendUrl}/profile?github=error"; }, 500);</script>`);
   }
 });
 

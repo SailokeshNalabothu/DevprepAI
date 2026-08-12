@@ -1,0 +1,13 @@
+{
+  "name": "devprep-automated-tests",
+  "version": "1.0.0",
+  "description": "Appium E2E Automated Test Suite & Excel Report Generator (300+ Test Cases) for DevPrep AI",
+  "main": "appium E2E test.js",
+  "scripts": {
+    "test": "node \"appium E2E test.js\"",
+    "appium": "node \"appium E2E test.js\""
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0"
+  }
+}

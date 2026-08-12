@@ -38,10 +38,23 @@ connectDB();
 const { createAdapter } = require("@socket.io/redis-adapter");
 const { createClient } = require("redis");
 
+const corsOriginDelegate = (origin, callback) => {
+  if (!origin || 
+      origin === (process.env.FRONTEND_URL || "http://localhost:3000") || 
+      origin.includes("localhost") || 
+      origin.includes("127.0.0.1") || 
+      origin.includes("10.") || 
+      origin.includes("192.168.")) {
+    callback(null, true);
+  } else {
+    callback(null, true); // Allow mobile/dev requests
+  }
+};
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: corsOriginDelegate,
     methods: ["GET", "POST"],
     credentials: true
   }
@@ -76,7 +89,7 @@ io.on("connection", (socket) => {
 
 // Core Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  origin: corsOriginDelegate,
   credentials: true,
 }));
 app.use(express.json());

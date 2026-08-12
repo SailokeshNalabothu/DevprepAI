@@ -121,7 +121,8 @@ exports.signup = async (req, res) => {
 
     res.status(201).json({
       message: "OTP sent to your email. Please verify to complete registration. (For development, check the backend console log for the code)",
-      email
+      email,
+      devOtp: otp
     });
 
   } catch (error) {
@@ -205,6 +206,8 @@ exports.login = async (req, res) => {
 
     res.json({
       message: "Login successful",
+      token: accessToken,
+      refreshToken,
       user: { id: user._id, name: user.name, email: user.email, role: user.role }
     });
 
@@ -285,7 +288,8 @@ exports.forgotPassword = async (req, res) => {
     await user.save();
 
     const { sendResetEmail } = require("../services/nodeMailerService");
-    const resetUrl = `http://localhost:3000/reset-password?token=${resetToken}`;
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
     console.log("\x1b[33m%s\x1b[0m", `[PASSWORD RESET DEVELOPER ALERT] Reset Link for ${email} is: ${resetUrl}`);
     
     try {
