@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import API from "../services/api";
+import API, { API_BASE } from "../services/api";
 import { 
   User, 
   GitBranch as Github, 
@@ -312,7 +312,7 @@ function Profile() {
               if (profile.githubToken) {
                 handleGithubSync();
               } else {
-                window.location.href = "http://localhost:5000/api/users/github/auth";
+                window.location.href = `${API_BASE}/users/github/auth`;
               }
             }}
             disabled={syncing}

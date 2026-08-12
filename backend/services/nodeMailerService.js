@@ -36,6 +36,7 @@ exports.sendOTPEmail = async (email, otp) => {
 };
 
 exports.sendWelcomeEmail = async (email, name) => {
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
   const mailOptions = {
     from: `"DevPrep AI" <${process.env.EMAIL_USER}>`,
     to: email,
@@ -50,7 +51,7 @@ exports.sendWelcomeEmail = async (email, name) => {
           Your technical journey starts here. You now have full access to our elite AI interview agents, coding lessons, and architectural challenges.
         </p>
         <div style="text-align: center; margin-bottom: 40px;">
-          <a href="http://localhost:3000" style="background-color: #4f46e5; color: #ffffff; padding: 16px 32px; border-radius: 14px; text-decoration: none; font-weight: 800; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);">Enter the Platform</a>
+          <a href="${frontendUrl}" style="background-color: #4f46e5; color: #ffffff; padding: 16px 32px; border-radius: 14px; text-decoration: none; font-weight: 800; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);">Enter the Platform</a>
         </div>
         <p style="font-size: 14px; color: #94a3b8; text-align: center;">We're excited to see what you build.</p>
         <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 30px 0;" />

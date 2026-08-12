@@ -59,7 +59,7 @@ const setTokenCookies = (res, accessToken, refreshToken) => {
   res.cookie("token", accessToken, {
     httpOnly: true,
     secure: isProd, // Disable secure on localhost to allow cookies over HTTP
-    sameSite: isProd ? "strict" : "lax", // Lax is necessary for redirects to work on local dev
+    sameSite: isProd ? "none" : "lax", // 'none' allows cross-origin requests between Vercel and backend
     path: "/",
     maxAge: 15 * 60 * 1000, // 15 mins
   });
@@ -67,7 +67,7 @@ const setTokenCookies = (res, accessToken, refreshToken) => {
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: isProd,
-    sameSite: isProd ? "strict" : "lax",
+    sameSite: isProd ? "none" : "lax",
     path: "/",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });

@@ -107,13 +107,13 @@ router.get("/github/auth", authMiddleware, (req, res) => {
   res.cookie("github_state", state, {
     httpOnly: true,
     secure: isProd,
-    sameSite: "lax",
+    sameSite: isProd ? "none" : "lax",
     maxAge: 10 * 60 * 1000 // 10 minutes
   });
   res.cookie("github_user_id", req.user.id, {
     httpOnly: true,
     secure: isProd,
-    sameSite: "lax",
+    sameSite: isProd ? "none" : "lax",
     maxAge: 10 * 60 * 1000 // 10 minutes
   });
 

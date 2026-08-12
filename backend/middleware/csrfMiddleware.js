@@ -11,7 +11,8 @@ module.exports = (req, res, next) => {
 
   const origin = req.headers.origin;
   const referer = req.headers.referer;
-  const allowedOrigin = process.env.FRONTEND_URL || "http://localhost:3000";
+  const rawAllowed = process.env.FRONTEND_URL || "http://localhost:3000";
+  const allowedOrigin = rawAllowed.replace(/\/$/, "");
 
   // Native mobile app requests (no browser origin header) or matching allowed origins
   if (!origin && !referer) {
@@ -27,7 +28,7 @@ module.exports = (req, res, next) => {
   };
 
   // 1. Origin header check
-  if (origin && origin !== allowedOrigin && !isLocalIp(origin)) {
+  if (origin && origin.replace(/\/$/, "") !== allowedOrigin && !isLocalIp(origin)) {
     console.warn(`[CSRF Alert] Rejected request from invalid origin: ${origin}`);
     return res.status(403).json({ message: "CSRF protection: Invalid origin" });
   }

@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { initVimMode } from 'monaco-vim';
+import { sendRewardToAndroidApp, isRunningInScrollOrStudyApp, closeToStudyApp } from "../utils/androidBridge";
 
 const codeTemplates = {
   javascript: `function solution() {\n  // Type your code here\n}`,
@@ -250,6 +251,9 @@ function CodeEditor() {
       setExplanation(res.data.explanation || "Evaluation passed");
       setComplexity(res.data.complexity || "Time: O(N) | Space: O(1)");
       
+      // Notify parent ScrollOrStudy Android app if connected
+      sendRewardToAndroidApp(25, question?.title || "Coding Challenge");
+
       const subRes = await API.get("/submissions/my-submissions");
       const filtered = subRes.data.filter(s => s.questionId?._id === id);
       setSubmissions(filtered);
@@ -269,19 +273,36 @@ function CodeEditor() {
     );
   }
 
+  const inScrollOrStudy = isRunningInScrollOrStudyApp();
+
   return (
     <div className="h-screen bg-[#090a0f] flex flex-col font-sans text-white overflow-hidden selection:bg-indigo-500/30">
       {/* Header Area */}
       <header className="h-14 bg-[#18181b]/60 border-b border-white/10 flex items-center justify-between px-6 shadow-sm z-20 backdrop-blur-xl shrink-0">
         <div className="flex items-center space-x-4">
-          <Link to="/questions" className="p-1.5 bg-white/5 border border-white/15 rounded-lg text-white/70 hover:text-white transition-all">
-            <ChevronLeft size={16} />
-          </Link>
+          {inScrollOrStudy ? (
+            <button
+              onClick={closeToStudyApp}
+              className="px-2.5 py-1.5 bg-emerald-500/20 border border-emerald-500/40 rounded-lg text-emerald-400 font-bold text-xs hover:bg-emerald-500/30 transition-all flex items-center gap-1 cursor-pointer"
+            >
+              <span>📱</span>
+              <span>Back to Study</span>
+            </button>
+          ) : (
+            <Link to="/questions" className="p-1.5 bg-white/5 border border-white/15 rounded-lg text-white/70 hover:text-white transition-all">
+              <ChevronLeft size={16} />
+            </Link>
+          )}
           <div className="flex items-center space-x-2.5">
             <div className="p-1.5 bg-indigo-500/10 rounded-lg">
               <Code2 size={16} className="text-indigo-400" />
             </div>
             <span className="text-sm font-bold text-white tracking-tight leading-none">Coding Workspace</span>
+            {inScrollOrStudy && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                +25 🪙 on Submit
+              </span>
+            )}
           </div>
         </div>
 

@@ -9,7 +9,9 @@ import {
   BrainCircuit,
   ArrowRight,
   BookOpen,
+  Bug,
 } from 'lucide-react';
+import { isRunningInScrollOrStudyApp, closeToStudyApp } from '../utils/androidBridge';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -74,7 +76,33 @@ const Dashboard = () => {
           <h1 className="text-xl font-bold tracking-tight">Home</h1>
           <p className="text-[11px] text-white/50 font-medium">Welcome back, {user?.name || 'Developer'}!</p>
         </div>
+
+        {isRunningInScrollOrStudyApp() && (
+          <button
+            onClick={closeToStudyApp}
+            className="px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/40 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+          >
+            <span>📱</span>
+            <span>Return to Study Dashboard</span>
+          </button>
+        )}
       </div>
+
+      {/* ScrollOrStudy Active Mode Alert Banner */}
+      {isRunningInScrollOrStudyApp() && (
+        <div className="bg-gradient-to-r from-indigo-950/80 via-purple-950/70 to-indigo-950/80 border border-indigo-500/30 rounded-2xl p-4 flex items-center justify-between shadow-lg">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 bg-indigo-500/20 rounded-xl text-lg">💡</div>
+            <div>
+              <h3 className="text-sm font-bold text-white">ScrollOrStudy Mode Active</h3>
+              <p className="text-xs text-indigo-200/80">Solve any coding problem or bug fix challenge to earn <b>+25 Focus Credits</b> and unlock a 10-minute break pass!</p>
+            </div>
+          </div>
+          <span className="hidden sm:inline-block px-3 py-1 bg-indigo-500 text-white font-extrabold text-[11px] rounded-full shadow-md">
+            +25 🪙 / Challenge
+          </span>
+        </div>
+      )}
 
       {/* Main Grid: Left Panel (2/3) and Right Panel (1/3) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">

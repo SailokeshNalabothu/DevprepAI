@@ -33,14 +33,18 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 
+// Trust reverse proxy (essential for Render, Railway, Vercel, AWS behind HTTPS)
+app.set("trust proxy", 1);
+
 connectDB();
 
 const { createAdapter } = require("@socket.io/redis-adapter");
 const { createClient } = require("redis");
 
 const corsOriginDelegate = (origin, callback) => {
+  const allowedFrontend = (process.env.FRONTEND_URL || "http://localhost:3000").replace(/\/$/, "");
   if (!origin || 
-      origin === (process.env.FRONTEND_URL || "http://localhost:3000") || 
+      origin.replace(/\/$/, "") === allowedFrontend || 
       origin.includes("localhost") || 
       origin.includes("127.0.0.1") || 
       origin.includes("10.") || 
@@ -60,14 +64,24 @@ const io = new Server(server, {
   }
 });
 
-// Redis Adapter setup
-const pubClient = createClient({ url: process.env.REDIS_URL || 'redis://127.0.0.1:6379' });
-const subClient = pubClient.duplicate();
+// Redis Adapter setup (optional in single-instance production, connects if REDIS_URL provided)
+if (process.env.REDIS_URL && process.env.REDIS_URL !== "redis://127.0.0.1:6379") {
+  const pubClient = createClient({ url: process.env.REDIS_URL });
+  const subClient = pubClient.duplicate();
 
-Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
-  io.adapter(createAdapter(pubClient, subClient));
-  console.log("Redis Adapter Connected horizontally scaling Socket.io!");
-}).catch(err => console.error("Redis Adapter Connection Error:", err));
+  Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+    io.adapter(createAdapter(pubClient, subClient));
+    console.log("Redis Adapter Connected horizontally scaling Socket.io!");
+  }).catch(err => console.error("Redis Adapter Connection Error:", err.message));
+} else if (process.env.NODE_ENV !== "production") {
+  const pubClient = createClient({ url: process.env.REDIS_URL || 'redis://127.0.0.1:6379' });
+  const subClient = pubClient.duplicate();
+
+  Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+    io.adapter(createAdapter(pubClient, subClient));
+    console.log("Local Redis Adapter Connected for Socket.io");
+  }).catch(err => console.warn("Local Redis not detected. Using memory adapter."));
+}
 
 // Real-time Events
 io.on("connection", (socket) => {

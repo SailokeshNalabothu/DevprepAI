@@ -1,7 +1,9 @@
 import axios from "axios";
 
+export const API_BASE = (process.env.REACT_APP_API_URL || "http://localhost:5000/api").replace(/\/$/, "");
+
 const API = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: API_BASE,
   withCredentials: true, // Enable sending/receiving cookies
 });
 
@@ -16,7 +18,7 @@ API.interceptors.response.use(
       
       try {
         // Refresh token endpoint now checks the 'refreshToken' cookie automatically
-        await axios.post("http://localhost:5000/api/auth/refresh-token", {}, { withCredentials: true });
+        await axios.post(`${API_BASE}/auth/refresh-token`, {}, { withCredentials: true });
         
         // Retry the original request (it will now include the new cookies)
         return API(originalRequest);

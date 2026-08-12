@@ -11,6 +11,7 @@ import {
   MessageSquare,
   Zap
 } from "lucide-react";
+import { sendRewardToAndroidApp, isRunningInScrollOrStudyApp, closeToStudyApp } from "../utils/androidBridge";
 
 function BugFixMode() {
   const { id } = useParams();
@@ -68,6 +69,9 @@ function BugFixMode() {
       });
       setAnalysis(res.data.analysis);
       setCompleted(true);
+
+      // Award credits in ScrollOrStudy app upon completing bug fix
+      sendRewardToAndroidApp(25, question?.title ? `Bug Fix: ${question.title}` : "Bug Fix Challenge");
     } catch (error) {
       console.error("Analysis Error:", error);
     } finally {
@@ -80,6 +84,8 @@ function BugFixMode() {
     setAnalysis("");
     setCompleted(false);
   };
+
+  const inScrollOrStudy = isRunningInScrollOrStudyApp();
 
   if (loading) {
     return (
@@ -95,9 +101,19 @@ function BugFixMode() {
       {/* Header Bar */}
       <header className="h-14 bg-[#18181b]/60 border-b border-white/10 flex items-center justify-between px-6 shadow-sm z-20 backdrop-blur-xl">
         <div className="flex items-center space-x-4">
-          <button onClick={() => navigate(-1)} className="p-1.5 bg-white/5 border border-white/15 rounded-lg text-white/70 hover:text-white transition-all cursor-pointer">
-            <ChevronLeft size={16} />
-          </button>
+          {inScrollOrStudy ? (
+            <button 
+              onClick={closeToStudyApp} 
+              className="px-2.5 py-1.5 bg-emerald-500/20 border border-emerald-500/40 rounded-lg text-emerald-400 font-bold text-xs hover:bg-emerald-500/30 transition-all flex items-center gap-1 cursor-pointer"
+            >
+              <span>📱</span>
+              <span>Back to Study</span>
+            </button>
+          ) : (
+            <button onClick={() => navigate(-1)} className="p-1.5 bg-white/5 border border-white/15 rounded-lg text-white/70 hover:text-white transition-all cursor-pointer">
+              <ChevronLeft size={16} />
+            </button>
+          )}
           <div className="flex items-center gap-2.5">
             <div className="p-1.5 bg-rose-500/10 rounded-lg">
               <Bug size={16} className="text-rose-400" />
@@ -106,6 +122,11 @@ function BugFixMode() {
               <h1 className="text-sm font-bold text-white leading-none">Bug Fixer</h1>
               <p className="text-[9px] text-white/40 font-bold uppercase tracking-wider mt-0.5">Target: {question?.title}</p>
             </div>
+            {inScrollOrStudy && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 ml-2">
+                +25 🪙 on Solve
+              </span>
+            )}
           </div>
         </div>
 
