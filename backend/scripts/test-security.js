@@ -20,9 +20,15 @@ const env = {
 const serverProcess = spawn('node', ['server.js'], { env, cwd: path.join(__dirname, '..') });
 
 let serverOutput = '';
+let serverReady = false;
+
 serverProcess.stdout.on('data', (data) => {
-  serverOutput += data.toString();
-  console.log(`[Server] ${data.toString().trim()}`);
+  const str = data.toString();
+  serverOutput += str;
+  console.log(`[Server] ${str.trim()}`);
+  if (str.includes('Server running on port') || str.includes('MongoDB Connected')) {
+    serverReady = true;
+  }
 });
 
 serverProcess.stderr.on('data', (data) => {
@@ -46,7 +52,26 @@ function runRequest(options, postData = null) {
   });
 }
 
+async function waitForServer(attempts = 15) {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      await new Promise((resolve, reject) => {
+        const req = http.get('http://127.0.0.1:5099/', (res) => resolve(res));
+        req.on('error', (err) => reject(err));
+        req.end();
+      });
+      console.log("✅ Security Test Server is ready and listening on port 5099.");
+      return true;
+    } catch (e) {
+      await new Promise((r) => setTimeout(r, 800));
+    }
+  }
+  console.warn("⚠️ Server ping timeout, proceeding with test execution...");
+  return false;
+}
+
 async function runTests() {
+  await waitForServer();
   let passed = true;
 
   try {
@@ -54,7 +79,7 @@ async function runTests() {
     console.log("\n--- Test 1: Testing CSRF middleware blocking malicious Origin ---");
     const loginData = JSON.stringify({ email: 'test@example.com', password: 'Password123!' });
     const res1 = await runRequest({
-      hostname: 'localhost',
+      hostname: '127.0.0.1',
       port: 5099,
       path: '/api/auth/login',
       method: 'POST',
@@ -78,7 +103,7 @@ async function runTests() {
     // 2. Verify CSRF Protection with an Allowed Origin (http://localhost:3000)
     console.log("\n--- Test 2: Testing CSRF middleware allowing trusted Origin ---");
     const res2 = await runRequest({
-      hostname: 'localhost',
+      hostname: '127.0.0.1',
       port: 5099,
       path: '/api/auth/login',
       method: 'POST',
@@ -115,5 +140,5 @@ async function runTests() {
   }
 }
 
-console.log("Waiting 3 seconds for server to boot...");
-setTimeout(runTests, 3000);
+console.log("Waiting for security test server to initialize...");
+runTests();
