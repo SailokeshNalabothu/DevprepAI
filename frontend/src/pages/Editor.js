@@ -14,7 +14,6 @@ import {
   Maximize2,
   Settings,
   ChevronLeft,
-  ChevronRight,
   Database,
   Cpu,
   Plus,
@@ -96,6 +95,7 @@ function CodeEditor() {
             label: 'clg',
             kind: monaco.languages.CompletionItemKind.Snippet,
             documentation: 'Console Log',
+            // eslint-disable-next-line no-template-curly-in-string
             insertText: 'console.log(${1:obj});',
             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
             range: range,
@@ -112,6 +112,7 @@ function CodeEditor() {
             label: 'fn',
             kind: monaco.languages.CompletionItemKind.Snippet,
             documentation: 'Function Template',
+            // eslint-disable-next-line no-template-curly-in-string
             insertText: 'function ${1:name}(${2:params}) {\n\t$0\n}',
             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
             range: range,

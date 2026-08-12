@@ -7,7 +7,6 @@ import {
   Lock, 
   CheckCircle2, 
   Clock, 
-  Settings, 
   Activity,
   Cpu,
   ShieldCheck,

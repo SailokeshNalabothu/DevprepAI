@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import API from "../services/api";
-import { CheckCircle2, Loader2, Key, ShieldAlert, ShieldCheck } from "lucide-react";
+import { CheckCircle2, Loader2, Key, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
 
 function VerifyOTP() {

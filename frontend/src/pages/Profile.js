@@ -2,13 +2,11 @@ import React, { useEffect, useState } from "react";
 import API from "../services/api";
 import { 
   User, 
-  Mail, 
   GitBranch as Github, 
   BrainCircuit, 
   BarChart3, 
   CheckCircle2,
   Loader2,
-  Calendar,
   Shield,
   MapPin,
   FileText,

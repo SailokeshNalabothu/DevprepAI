@@ -14,10 +14,6 @@ import {
   FileSearch,
   Layout,
   ShieldCheck,
-  Terminal,
-  Users,
-  Radio,
-  Lock
 } from 'lucide-react';
 
 const Sidebar = () => {

@@ -9,9 +9,7 @@ import {
   BrainCircuit,
   ArrowRight,
   BookOpen,
-  Bug
 } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 const Dashboard = () => {
   const navigate = useNavigate();

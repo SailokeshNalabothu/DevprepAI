@@ -2,14 +2,11 @@ import React, { useState, useEffect } from "react";
 import API from "../services/api";
 import { 
   CheckCircle2, 
-  XCircle, 
-  Cpu, 
   Database, 
   ShieldCheck, 
   Mic, 
   Zap, 
   Loader2,
-  Terminal,
   BrainCircuit,
   Settings
 } from "lucide-react";
